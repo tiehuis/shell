@@ -4,20 +4,20 @@
 #include <iterator>
 #include "shcom.h"
 
-static std::set<std::string> Commands = {
+static std::set<std::string> commandset = {
     "exit", "end", "close", "cleanup", "claim", "clup", "bin",
     "kill", "top", "ls", "gcc", "g++"
 };
 
-size_t Shell::autocomplete(std::vector<std::string> &Completions, 
-        const std::string &Command)
+std::size_t Shell::autocomplete(std::vector<std::string> &completions, 
+        const std::string &command)
 {
-    size_t found = 0;
-    Completions.clear();
+    std::size_t found = 0;
+    completions.clear();
 
-    for (auto it : Commands) {
-        if (it.find(Command) == 0) {
-            Completions.push_back(it);
+    for (auto it : commandset) {
+        if (it.find(command) == 0) {
+            completions.push_back(it);
             ++found;
         }
     }

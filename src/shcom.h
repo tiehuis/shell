@@ -2,8 +2,8 @@
 #define _SHCOM_H_
 
 namespace Shell {
-    size_t autocomplete(std::vector<std::string> &Completions, 
-            const std::string &Command);
+    std::size_t autocomplete(std::vector<std::string> &completions, 
+            const std::string &command);
 }
 
 #endif

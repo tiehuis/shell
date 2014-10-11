@@ -1,10 +1,22 @@
 #include <cstdio>
 #include <cstdlib>
+#include <csignal>
+#include <iostream>
 #include <termios.h>
 #include <unistd.h>
 #include "shio.h"
 
+static pid_t shell_pid;
 static struct termios init;
+
+static void signal_handler(int signo)
+{
+    if (signo == SIGINT) {
+        std::cout << "^C" << std::endl << "-> ";
+        if (getpid() != shell_pid)
+            raise(SIGTERM);
+    }
+}
 
 static void destroy_term(void)
 {
@@ -19,6 +31,9 @@ void Shell::setup_term(void)
     newt.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
     std::atexit(destroy_term);
+
+    shell_pid = getpid();
+    signal(SIGINT, signal_handler);
 }
 
 int Shell::getch(void)
