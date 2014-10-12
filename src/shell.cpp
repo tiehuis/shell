@@ -7,6 +7,7 @@
 #include "shcom.h"
 #include "shexec.h"
 #include "shparse.h"
+#include "shhist.h"
 
 static const std::string ps1 = "-> ";
 
@@ -21,6 +22,29 @@ int main(void)
     while (1) {
         char c = Shell::getch();
 
+        if (c == '\033') {
+            Shell::getch();
+            switch (Shell::getch()) {
+            case 'A':
+                if (!Shell::historybegin()) {
+                    command = Shell::prevhistory();
+                    std::cout << "\033[2K" << '\r';
+                    std::cout << ps1 << command;
+                }
+                break;
+            case 'B':
+                if (!Shell::historyend()) {
+                    command = Shell::nexthistory();
+                    std::cout << "\033[2K" << '\r';
+                    std::cout << ps1 << command;
+                }
+                break;
+            case 'C':
+            case 'D':
+                /* Ignore left and right keys for now */
+                break;
+            }
+        }
         if (c == 4) {
             if (command.empty()) {
                 std::cout << std::endl;
@@ -54,6 +78,7 @@ int main(void)
             std::vector<std::string> splitcommand;
             Shell::parsecommand(splitcommand, command);
             Shell::executecommand(splitcommand);
+            Shell::addhistory(command);
             command.clear();
         }
         else if (c == '\b' || c == 127) {
