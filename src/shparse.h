@@ -2,7 +2,8 @@
 #define _SHPARSE_H_
 
 namespace Shell {
-    void parsecommand(std::vector<std::string> &parsed, const std::string &command);
+    void tokenize(std::vector<std::string> &parsed, const std::string &command,
+            const char delimiter = ' ');
 }
 
 #endif

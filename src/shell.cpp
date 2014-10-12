@@ -94,7 +94,7 @@ int main(void)
 
             /* Try to execute the command */
             std::vector<std::string> splitcommand;
-            Shell::parsecommand(splitcommand, command);
+            Shell::tokenize(splitcommand, command);
             Shell::executecommand(splitcommand);
             Shell::addhistory(command);
             command.clear();
