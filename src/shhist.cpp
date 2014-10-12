@@ -6,7 +6,7 @@
 static std::vector<std::string> history = { "" };
 
 /* Using an iterator here would be better */
-static std::size index = 0;
+static std::size_t index = 0;
 
 /* Check bounds properly for all cases */
 bool Shell::historyend(void)

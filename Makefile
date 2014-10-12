@@ -1,8 +1,15 @@
-CC	    = g++
-CFLAGS  = -std=c++11 -Wall -Wextra
-SRCS    = src/shell.cpp src/shio.cpp src/shcom.cpp src/shexec.cpp src/shparse.cpp \
-		  src/shbuiltin.cpp src/shhist.cpp
-OBJS    = $(SRCS:.cpp=.o)
+CXX		 = g++
+LD		 = ld
+CXXFLAGS = -std=c++11 -Wall -Wextra
+LFLAGS   =
 
-all: $(SRCS)
-	$(CC) $(CFLAGS) $(SRCS) -o shell
+DIRSRC   = src
+DIRBUILD = build
+SRCS	 = $(wildcard $(DIRSRC)/*.cpp)
+OBJS	 = $(addprefix $(DIRBUILD)/, $(notdir $(SRCS:.cpp=.o)))
+
+shell: $(OBJS)
+	$(CXX) $(LFLAGS) $(OBJS) -o $@
+
+$(DIRBUILD)/%.o: $(DIRSRC)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
