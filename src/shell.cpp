@@ -10,6 +10,7 @@
 #include "shhist.h"
 
 static const std::string ps1 = "-> ";
+static const std::size_t commands_cutoff = 80;
 
 int main(void)
 {
@@ -45,7 +46,7 @@ int main(void)
                 break;
             }
         }
-        if (c == 4) {
+        else if (c == 4) {
             if (command.empty()) {
                 std::cout << std::endl;
                 exit(0);
@@ -61,6 +62,23 @@ int main(void)
                 std::cout << ps1 << command;
             }
             else if (options) {
+                if (options > commands_cutoff) {
+                    std::cout << std::endl;
+                    std::cout << "Display all " << options;
+                    std::cout << " matches? (y) or (n)";
+                    std::cout << std::endl;
+    
+                    char c;
+                    do {
+                        c = std::toupper(Shell::getch());
+                    } while (c != 'Y' && c != 'N');
+                    
+                    if (c == 'N') {
+                        std::cout << std::endl << ps1 << command;
+                        continue;
+                    }
+                }
+
                 std::cout << "\033[36m";
                 std::cout << std::endl;
                 for (auto str : completions)
