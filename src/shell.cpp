@@ -8,17 +8,18 @@
 #include "shexec.h"
 #include "shparse.h"
 #include "shhist.h"
+#include "shglo.h"
 
-static const std::string ps1 = "-> ";
-static const std::size_t commands_cutoff = 80;
+using std::cout;
+using std::endl;
 
 int main(void)
 {
     Shell::setup_term();
     std::string command;
     
-    std::cout << ps1;
-    std::flush(std::cout);
+    cout << Shell::ps1;
+    std::flush(cout);
 
     while (1) {
         char c = Shell::getch();
@@ -29,15 +30,13 @@ int main(void)
             case 'A':
                 if (!Shell::historybegin()) {
                     command = Shell::prevhistory();
-                    std::cout << "\033[2K" << '\r';
-                    std::cout << ps1 << command;
+                    cout << "\033[2K\r" << Shell::ps1 << command;
                 }
                 break;
             case 'B':
                 if (!Shell::historyend()) {
                     command = Shell::nexthistory();
-                    std::cout << "\033[2K" << '\r';
-                    std::cout << ps1 << command;
+                    cout << "\033[2K\r" << Shell::ps1 << command;
                 }
                 break;
             case 'C':
@@ -48,8 +47,10 @@ int main(void)
         }
         else if (c == 4) {
             if (command.empty()) {
-                std::cout << std::endl;
-                exit(0);
+                cout << '\r' << Shell::ps1 << "exit" << endl;
+                std::vector<std::string> splitcommand;
+                Shell::tokenize(splitcommand, "exit");
+                Shell::executecommand(splitcommand);
             }
         }
         else if (c == '\t') { 
@@ -58,15 +59,12 @@ int main(void)
 
             if (options == 1) {
                 command = completions[0];
-                std::cout << '\r';
-                std::cout << ps1 << command;
+                cout << '\r' << Shell::ps1 << command;
             }
             else if (options) {
-                if (options > commands_cutoff) {
-                    std::cout << std::endl;
-                    std::cout << "Display all " << options;
-                    std::cout << " matches? (y) or (n)";
-                    std::cout << std::endl;
+                if (options > Shell::comcutoff) {
+                    cout << endl << "Display all " << options;
+                    cout << " matches? (y) or (n)" << endl;
     
                     char c;
                     do {
@@ -74,23 +72,18 @@ int main(void)
                     } while (c != 'Y' && c != 'N');
                     
                     if (c == 'N') {
-                        std::cout << std::endl << ps1 << command;
+                        cout << endl << Shell::ps1 << command;
                         continue;
                     }
                 }
 
-                std::cout << "\033[36m";
-                std::cout << std::endl;
                 for (auto str : completions)
-                    std::cout << "-" << str << std::endl;
-                std::cout << "\033[0m";
-                std::cout << ps1 << command;
+                    cout << "\033[36m" << str << endl;
+                cout << "\033[0m" << Shell::ps1 << command;
             }
         }
         else if (c == '\n') {
-            std::cout << '\r';
-            std::cout << ps1 << command << std::endl;
-            std::cout << ps1;
+            cout << '\r' << Shell::ps1 << command << endl;
 
             /* Try to execute the command */
             std::vector<std::string> splitcommand;
@@ -98,22 +91,23 @@ int main(void)
             Shell::executecommand(splitcommand);
             Shell::addhistory(command);
             command.clear();
+            cout << Shell::ps1;
         }
         else if (c == '\b' || c == 127) {
             if (!command.empty()) {
                 command.pop_back();
-                std::cout << "\b \b";
+                cout << "\b \b";
             }
         }
         else if (std::isprint(c)) {
             command.push_back(c);
-            std::cout << c;
+            cout << c;
         }
         else {
             /* Other things to put here */
         }
 
-        std::flush(std::cout);
+        std::flush(cout);
     }
 
     exit(0);

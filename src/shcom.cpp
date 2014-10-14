@@ -14,7 +14,7 @@ static std::set<std::string> commandset = {
     "cd", "exit"
 };
 
-static void gathercommands(void)
+void Shell::gathercommands(void)
 {
     char *s = std::getenv("PATH");
     if (!s) return;
@@ -26,7 +26,7 @@ static void gathercommands(void)
     for (auto component : path_vec) {
         DIR *com = opendir(component.c_str());
         if (!com) {
-            std::cerr << strerror(errno) << std::endl;
+            // std::cerr << strerror(errno) << std::endl;
         }
         else {
             struct dirent *buf;
@@ -40,10 +40,6 @@ static void gathercommands(void)
 std::size_t Shell::autocomplete(std::vector<std::string> &completions, 
         const std::string &command)
 {
-    /* Attempt to gather commands if we haven't. Should periodically update */
-    if (commandset.size() == 2)
-        gathercommands();
-
     std::size_t found = 0;
     completions.clear();
 

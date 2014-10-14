@@ -4,16 +4,17 @@
 #include <iostream>
 #include <termios.h>
 #include <unistd.h>
+#include "shcom.h"
 #include "shio.h"
+#include "shglo.h"
 
-static pid_t shell_pid;
 static struct termios init;
 
 static void signal_handler(int signo)
 {
     if (signo == SIGINT) {
-        std::cout << "^C" << std::endl << "-> ";
-        if (getpid() != shell_pid)
+        std::cout << "^C" << std::endl << Shell::ps1;
+        if (getpid() != Shell::pid)
             raise(SIGTERM);
     }
 }
@@ -32,7 +33,8 @@ void Shell::setup_term(void)
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
     std::atexit(destroy_term);
 
-    shell_pid = getpid();
+    Shell::pid = getpid();
+    Shell::gathercommands();
     signal(SIGINT, signal_handler);
 }
 

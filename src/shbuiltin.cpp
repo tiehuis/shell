@@ -11,7 +11,6 @@ static std::set<std::string> builtins = {
 
 static void sh_exit(void)
 {
-    std::cout << "..." << std::endl;
     exit(0);
 }
 
