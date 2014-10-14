@@ -77,6 +77,7 @@ int main(void)
                     }
                 }
 
+                cout << endl;
                 for (auto str : completions)
                     cout << "\033[36m" << str << endl;
                 cout << "\033[0m" << Shell::ps1 << command;
