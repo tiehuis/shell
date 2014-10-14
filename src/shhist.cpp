@@ -1,14 +1,15 @@
+#include <iostream>
 #include <vector>
+#include <iterator>
 #include <string>
 #include "shhist.h"
+#include "shglo.h"
 
 /* Keep an empty string in history */
 static std::vector<std::string> history = { "" };
 
-/* Using an iterator here would be better */
 static std::size_t index = 0;
 
-/* Check bounds properly for all cases */
 bool Shell::historyend(void)
 {
     return index == history.size() - 1;
@@ -21,19 +22,24 @@ bool Shell::historybegin(void)
 
 std::string& Shell::nexthistory(void)
 {
-    return history[index++];
+    return history[++index];
 }
 
 std::string& Shell::prevhistory(void)
 {
-    return history[index--];
+    return history[--index];
 }
 
-/* Alter so that we remove any history item we used */
 void Shell::addhistory(std::string &command)
 {
+    if (index != history.size() - 1)
+        history.erase(history.begin() + index);
+
+    if (history.size() > Shell::maxhistory)
+        history.erase(history.begin());
+
     history.pop_back();
     history.push_back(command);
     history.push_back("");
-    index = history.size() - 2;
+    index = history.size() - 1;
 }

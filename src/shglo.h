@@ -7,6 +7,7 @@
 namespace Shell {
     extern const std::string ps1;
     extern const std::size_t comcutoff;
+    extern const std::size_t maxhistory;
     extern pid_t pid;
 }
 
