@@ -17,6 +17,7 @@ int main(void)
 {
     Shell::setup_term();
     std::string command;
+    std::size_t spos = 0;   /* Current cursor position */
     
     cout << Shell::ps1;
     std::flush(cout);
@@ -30,18 +31,28 @@ int main(void)
             case 'A':
                 if (!Shell::historybegin()) {
                     command = Shell::prevhistory();
+                    spos = command.length();
                     cout << "\033[2K\r" << Shell::ps1 << command;
                 }
                 break;
             case 'B':
                 if (!Shell::historyend()) {
                     command = Shell::nexthistory();
+                    spos = command.length();
                     cout << "\033[2K\r" << Shell::ps1 << command;
                 }
                 break;
             case 'C':
+                if (spos < command.length()) {
+                    cout << "\033[C";
+                    spos++;
+                }
+                break;
             case 'D':
-                /* Ignore left and right keys for now */
+                if (spos > 0) {
+                    cout << "\033[D";
+                    spos--;
+                }
                 break;
             }
         }
@@ -59,6 +70,7 @@ int main(void)
 
             if (options == 1) {
                 command = completions[0];
+                spos = command.length();
                 cout << '\r' << Shell::ps1 << command;
             }
             else if (options) {
@@ -92,17 +104,20 @@ int main(void)
             Shell::executecommand(splitcommand);
             Shell::addhistory(command);
             command.clear();
+            spos = 0;
             cout << Shell::ps1;
         }
         else if (c == '\b' || c == 127) {
-            if (!command.empty()) {
-                command.pop_back();
-                cout << "\b \b";
+            if (!command.empty() && spos > 0) {
+                command.erase(--spos, 1);
+                cout << "\033[D" << "\033[s" << "\033[2K\r";
+                cout << Shell::ps1 << command << "\033[u";
             }
         }
         else if (std::isprint(c)) {
-            command.push_back(c);
-            cout << c;
+            command.insert(command.begin() + spos++, c);
+            cout << "\033[C" << "\033[s" << "\033[2K\r";
+            cout << Shell::ps1 << command << "\033[u";
         }
         else {
             /* Other things to put here */

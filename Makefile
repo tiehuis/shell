@@ -1,5 +1,6 @@
 CXX	     = g++
-CXXFLAGS = -std=c++11 -march=native -O2
+CXXFLAGS = -std=c++11 
+#-march=native -O2
 
 LD	     = ld
 LIBS	 = 
